@@ -10,6 +10,7 @@ const earnsRoute = require('./src/routes/earns');
 const expensesRoute = require('./src/routes/expenses');
 
 var cors = require('cors');
+const { defineTables, createTables } = require('./src/database');
 app.use(cors());
 
 app.use('/users', usersRoute);
@@ -19,3 +20,6 @@ app.use('/expenses', expensesRoute);
 app.listen(port, () => {
   console.log(`Node.js HTTP server is running on port ${port}`);
 });
+
+defineTables();
+createTables();
