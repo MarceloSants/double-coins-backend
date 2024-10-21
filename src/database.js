@@ -1,11 +1,11 @@
 const { sequelize } = require('./config/sequelize');
-const { defineEarn } = require('./models/earn');
+const { defineEarning } = require('./models/earning');
 const { defineExpense } = require('./models/expense');
 const { defineUser } = require('./models/user');
 
 function defineTables() {
   defineUser();
-  defineEarn();
+  defineEarning();
   defineExpense();
 }
 

@@ -1,20 +1,23 @@
 const express = require('express');
-require('dotenv').config();
+const bodyParser = require('body-parser');
 
+require('dotenv').config();
 const port = process.env.PORT || 3000;
 
 const app = express();
 
 const usersRoute = require('./src/routes/users');
-const earnsRoute = require('./src/routes/earns');
+const earningsRoute = require('./src/routes/earnings');
 const expensesRoute = require('./src/routes/expenses');
 const { defineTables, createTables } = require('./src/database');
 
-var cors = require('cors');
+const cors = require('cors');
+
 app.use(cors());
+app.use(bodyParser.json());
 
 app.use('/users', usersRoute);
-app.use('/earns', earnsRoute);
+app.use('/earnings', earningsRoute);
 app.use('/expenses', expensesRoute);
 
 app.listen(port, () => {
@@ -23,3 +26,5 @@ app.listen(port, () => {
 
 defineTables();
 createTables();
+
+module.exports = app;

@@ -1,14 +1,14 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 
 const { addUser, getUserById } = require('../database/user');
-const { getEarnsByUserId } = require('../database/earn');
-const { getExpensesByUserId } = require('../database/expenses');
+const { getEarningsByUserId, addEarning } = require('../database/earning');
+const { getExpensesByUserId, addExpense } = require('../database/expenses');
 
 const router = express.Router();
-const jsonParser = bodyParser.json();
 
-router.post('/', jsonParser, async (req, res) => {
+/* User */
+
+router.post('/', async (req, res) => {
   const { name, email, password } = req.body;
 
   const user = await addUser(name, email, password);
@@ -16,21 +16,42 @@ router.post('/', jsonParser, async (req, res) => {
   res.send({ id: user.id });
 });
 
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
+router.get('/:userId', async (req, res) => {
+  const { userId } = req.params;
 
-  const user = await getUserById(id);
-  console.log(user);
+  const user = await getUserById(userId);
 
   res.send(user);
 });
 
-router.get('/:userId/earns', async (req, res) => {
+/* Eanings */
+
+router.post('/:userId/earnings', async (req, res) => {
+  const { userId } = req.params;
+  const { value, description, date } = req.body;
+
+  const earning = await addEarning(userId, value, description, date);
+
+  res.send({ id: earning.id });
+});
+
+router.get('/:userId/earnings', async (req, res) => {
   const { userId } = req.params;
 
-  const earns = await getEarnsByUserId(userId);
+  const earnings = await getEarningsByUserId(userId);
 
-  res.send(earns);
+  res.send(earnings);
+});
+
+/* Expenses */
+
+router.post('/:userId/expenses', async (req, res) => {
+  const { userId } = req.params;
+  const { value, description, category, date } = req.body;
+
+  const expense = await addExpense(userId, value, description, category, date);
+
+  res.send({ id: expense.id });
 });
 
 router.get('/:userId/expenses', async (req, res) => {

@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
-function defineEarn() {
-  sequelize.define('earns', {
+function defineEarning() {
+  sequelize.define('earnings', {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -21,4 +21,4 @@ function defineEarn() {
   });
 }
 
-module.exports = { defineEarn };
+module.exports = { defineEarning };
