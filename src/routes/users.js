@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const { addUser, getUser } = require('../database/user');
+const { getEarnsByUser } = require('../database/earn');
 
 const router = express.Router();
 const jsonParser = bodyParser.json();
@@ -14,17 +15,6 @@ router.post('/', jsonParser, async (req, res) => {
   res.send({ id: user.id });
 });
 
-// router.get('/', async (req, res) => {
-//   console.log('getUSer');
-
-//   const user = await getUser('Marcelo2');
-
-//   // console.log('user send');
-//   // console.log(user);
-
-//   res.send(user);
-// });
-
 router.get('/', async (req, res) => {
   console.log('get user by name');
   const { name } = req.query;
@@ -34,6 +24,14 @@ router.get('/', async (req, res) => {
   console.log(user);
 
   res.send(user);
+});
+
+router.get('/:userId/earns', async (req, res) => {
+  const { userId } = req.params;
+
+  const earns = await getEarnsByUser(userId);
+
+  res.send(earns);
 });
 
 module.exports = router;
