@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const { addUser, getUser } = require('../database/user');
-const { getEarnsByUser } = require('../database/earn');
+const { getEarnsByUserId } = require('../database/earn');
+const { getExpensesByUserId } = require('../database/expenses');
 
 const router = express.Router();
 const jsonParser = bodyParser.json();
@@ -29,9 +30,17 @@ router.get('/', async (req, res) => {
 router.get('/:userId/earns', async (req, res) => {
   const { userId } = req.params;
 
-  const earns = await getEarnsByUser(userId);
+  const earns = await getEarnsByUserId(userId);
 
   res.send(earns);
+});
+
+router.get('/:userId/expenses', async (req, res) => {
+  const { userId } = req.params;
+
+  const expenses = await getExpensesByUserId(userId);
+
+  res.send(expenses);
 });
 
 module.exports = router;

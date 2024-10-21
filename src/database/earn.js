@@ -11,7 +11,7 @@ async function addEarn(userId, value, description, date) {
   return earn;
 }
 
-async function getEarn(earnId) {
+async function getEarnById(earnId) {
   const earn = sequelize.models.earns.findOne({
     where: {
       id: earnId,
@@ -21,7 +21,7 @@ async function getEarn(earnId) {
   return earn;
 }
 
-async function getEarnsByUser(userId) {
+async function getEarnsByUserId(userId) {
   const earns = sequelize.models.earns.findAll({
     where: {
       userId: userId,
@@ -31,4 +31,4 @@ async function getEarnsByUser(userId) {
   return earns;
 }
 
-module.exports = { addEarn, getEarn, getEarnsByUser };
+module.exports = { addEarn, getEarnById, getEarnsByUserId };

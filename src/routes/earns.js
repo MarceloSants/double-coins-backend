@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const { addEarn, getEarn, getEarnsByUser } = require('../database/earn');
+const { addEarn, getEarnById } = require('../database/earn');
 
 const router = express.Router();
 const jsonParser = bodyParser.json();
@@ -19,7 +19,7 @@ router.get('/:id', async (req, res) => {
 
   const { id } = req.params;
 
-  const earn = await getEarn(id);
+  const earn = await getEarnById(id);
 
   res.send(earn);
 });
