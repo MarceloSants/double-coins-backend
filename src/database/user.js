@@ -10,14 +10,14 @@ async function addUser(name, email, password) {
   return user;
 }
 
-async function getUser(name) {
+async function getUserById(id) {
   const user = await sequelize.models.users.findOne({
     where: {
-      name: name,
+      id: id,
     },
   });
 
   return user;
 }
 
-module.exports = { addUser, getUser };
+module.exports = { addUser, getUserById };
