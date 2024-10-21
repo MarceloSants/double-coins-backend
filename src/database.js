@@ -1,3 +1,4 @@
+const { sequelize } = require('./config/sequelize');
 const { defineEarn } = require('./models/earn');
 const { defineExpense } = require('./models/expense');
 const { defineUser } = require('./models/user');
@@ -12,4 +13,4 @@ async function createTables() {
   await sequelize.sync({ force: false });
 }
 
-export { defineTables, createTables };
+module.exports = { defineTables, createTables };

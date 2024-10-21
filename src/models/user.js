@@ -18,4 +18,4 @@ function defineUser() {
   });
 }
 
-export { defineUser };
+module.exports = { defineUser };

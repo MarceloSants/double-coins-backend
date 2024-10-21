@@ -21,4 +21,4 @@ function defineEarn() {
   });
 }
 
-export { defineEarn };
+module.exports = { defineEarn };

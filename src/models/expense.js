@@ -15,4 +15,4 @@ function defineExpense() {
   });
 }
 
-export { defineExpense };
+module.exports = { defineExpense };
