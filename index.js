@@ -28,3 +28,8 @@ defineTables();
 createTables();
 
 module.exports = app;
+
+// Todo: Edit and Delete functions
+// Todo: Edit and Delete routes
+// Todo: Validation
+// Todo: Security

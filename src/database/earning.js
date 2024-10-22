@@ -1,7 +1,8 @@
+const { where } = require('sequelize');
 const { sequelize } = require('../config/sequelize');
 
 async function addEarning(userId, value, description, date) {
-  const earning = sequelize.models.earnings.create({
+  const earning = await sequelize.models.earnings.create({
     userId,
     value,
     description,
@@ -12,7 +13,7 @@ async function addEarning(userId, value, description, date) {
 }
 
 async function getEarningById(earningId) {
-  const earning = sequelize.models.earnings.findOne({
+  const earning = await sequelize.models.earnings.findOne({
     where: {
       id: earningId,
     },
@@ -22,7 +23,7 @@ async function getEarningById(earningId) {
 }
 
 async function getEarningsByUserId(userId) {
-  const earnings = sequelize.models.earnings.findAll({
+  const earnings = await sequelize.models.earnings.findAll({
     where: {
       userId: userId,
     },
@@ -31,4 +32,33 @@ async function getEarningsByUserId(userId) {
   return earnings;
 }
 
-module.exports = { addEarning, getEarningById, getEarningsByUserId };
+async function updateEarningById(earningId, value, description, date) {
+  const result = await sequelize.models.earnings.update(
+    { value: value, description: description, date: date },
+    {
+      where: {
+        id: earningId,
+      },
+    }
+  );
+
+  return result[0] === 1;
+}
+
+async function removeEarningById(earningId) {
+  const result = await sequelize.models.earnings.destroy({
+    where: {
+      id: earningId,
+    },
+  });
+
+  return result === 1; // One instance removed
+}
+
+module.exports = {
+  addEarning,
+  getEarningById,
+  getEarningsByUserId,
+  updateEarningById,
+  removeEarningById,
+};

@@ -1,7 +1,7 @@
 const { sequelize } = require('../config/sequelize');
 
 async function addExpense(userId, value, description, category, date) {
-  const expense = sequelize.models.expenses.create({
+  const expense = await sequelize.models.expenses.create({
     userId,
     value,
     description,
@@ -13,7 +13,7 @@ async function addExpense(userId, value, description, category, date) {
 }
 
 async function getExpenseById(expenseId) {
-  const expense = sequelize.models.expenses.findOne({
+  const expense = await sequelize.models.expenses.findOne({
     where: {
       id: expenseId,
     },
@@ -23,7 +23,7 @@ async function getExpenseById(expenseId) {
 }
 
 async function getExpensesByUserId(userId) {
-  const expenses = sequelize.models.expenses.findAll({
+  const expenses = await sequelize.models.expenses.findAll({
     where: {
       userId: userId,
     },
