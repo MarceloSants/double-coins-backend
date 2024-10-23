@@ -31,6 +31,8 @@ describe('Test User Routes', () => {
 /* Earnings routes */
 
 describe('Test Earnings Routes', () => {
+  let earningAddedId;
+
   // Test the route to get an earning by id
   it('should add a new earning', async () => {
     const userId = 1;
@@ -45,6 +47,8 @@ describe('Test Earnings Routes', () => {
     const res = await request(app)
       .post(`/users/${userId}/earnings`)
       .send(newEarning);
+
+    earningAddedId = res.body.id;
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('id');
@@ -62,18 +66,46 @@ describe('Test Earnings Routes', () => {
 
   // Test the route to get an earning by id
   it('should fetch a specific earning by id', async () => {
-    const earningId = 1;
+    const earningId = earningAddedId;
 
     const res = await request(app).get(`/earnings/${earningId}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('id', earningId);
   });
+
+  it('should update a specific earning by id', async () => {
+    const earningId = earningAddedId;
+
+    const newEarningValues = {
+      value: 111,
+      description: 'rent',
+      date: '2024-10-18T21:24:16.000Z',
+    };
+
+    const res = await request(app)
+      .put(`/earnings/${earningId}`)
+      .send(newEarningValues);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('result', true);
+  });
+
+  it('should remove a specific earning by id', async () => {
+    const earningId = earningAddedId;
+
+    const res = await request(app).delete(`/earnings/${earningId}`);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('result', true);
+  });
 });
 
 /* Expenses routes */
 
 describe('Test Expenses Routes', () => {
+  let expenseAddedId;
+
   // Test the route to get an expenses by id
   it('should add a new expense', async () => {
     const userId = 1;
@@ -88,6 +120,8 @@ describe('Test Expenses Routes', () => {
     const res = await request(app)
       .post(`/users/${userId}/expenses`)
       .send(newExpense);
+
+    expenseAddedId = res.body.id;
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('id');
@@ -105,12 +139,39 @@ describe('Test Expenses Routes', () => {
 
   // Test the route to get an expenses by id
   it('should fetch a specific expense by id', async () => {
-    const expensesId = 1;
+    const expensesId = expenseAddedId;
 
     const res = await request(app).get(`/expenses/${expensesId}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('id', expensesId);
+  });
+
+  it('should update a specific expense by id', async () => {
+    const expenseId = expenseAddedId;
+
+    const newExpenseValues = {
+      value: 100,
+      description: 'food',
+      category: 'food ',
+      date: '2024-10-17T21:24:16.000Z',
+    };
+
+    const res = await request(app)
+      .put(`/expenses/${expenseId}`)
+      .send(newExpenseValues);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('result', true);
+  });
+
+  it('should remove a specific expense by id', async () => {
+    const expenseId = expenseAddedId;
+
+    const res = await request(app).delete(`/expenses/${expenseId}`);
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('result', true);
   });
 });
 

@@ -29,7 +29,9 @@ createTables();
 
 module.exports = app;
 
-// Todo: Edit and Delete functions
-// Todo: Edit and Delete routes
+// Done: Edit and Delete functions
+// Done: Edit and Delete routes
+
+// Todo: Add test for edit and delete routes
 // Todo: Validation
 // Todo: Security
