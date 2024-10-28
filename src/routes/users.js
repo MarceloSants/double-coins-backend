@@ -1,65 +1,121 @@
 const express = require('express');
+const { validationResult } = require('express-validator');
 
 const { addUser, getUserById } = require('../database/user');
 const { getEarningsByUserId, addEarning } = require('../database/earning');
 const { getExpensesByUserId, addExpense } = require('../database/expenses');
+const {
+  userValidator,
+  userIdValidator,
+} = require('../validators/userValidators');
+const { earningValidator } = require('../validators/earningValidators');
+const { expenseValidator } = require('../validators/expenseValidators');
 
 const router = express.Router();
 
+const earningPostValidator = earningValidator.concat(userIdValidator);
+const expensePostValidator = expenseValidator.concat(userIdValidator);
+
 /* User */
 
-router.post('/', async (req, res) => {
+router.post('/', userValidator, async (req, res) => {
   const { name, email, password } = req.body;
 
-  const user = await addUser(name, email, password);
+  const result = validationResult(req);
+  if (result.isEmpty()) {
+    const user = await addUser(name, email, password);
 
-  res.send({ id: user.id });
+    return res.send({ id: user.id });
+  }
+
+  res.status(400).json({ errors: result.array() });
 });
 
-router.get('/:userId', async (req, res) => {
+router.get('/:userId', userIdValidator, async (req, res) => {
   const { userId } = req.params;
 
-  const user = await getUserById(userId);
+  const result = validationResult(req);
 
-  res.send(user);
+  if (result.isEmpty()) {
+    const user = await getUserById(userId);
+
+    if (user) {
+      return res.send(user);
+    } else {
+      return res
+        .status(400)
+        .json({ error: `cannot find a user with id ${userId}` });
+    }
+  }
+
+  res.status(400).json({ errors: result.array() });
 });
 
 /* Eanings */
 
-router.post('/:userId/earnings', async (req, res) => {
+router.post('/:userId/earnings', earningPostValidator, async (req, res) => {
   const { userId } = req.params;
   const { value, description, date } = req.body;
 
-  const earning = await addEarning(userId, value, description, date);
+  const result = validationResult(req);
+  if (result.isEmpty()) {
+    const earning = await addEarning(userId, value, description, date);
 
-  res.send({ id: earning.id });
+    return res.send({ id: earning.id });
+  }
+
+  res.status(400).json({ errors: result.array() });
 });
 
-router.get('/:userId/earnings', async (req, res) => {
+router.get('/:userId/earnings', userIdValidator, async (req, res) => {
   const { userId } = req.params;
 
-  const earnings = await getEarningsByUserId(userId);
+  const result = validationResult(req);
 
-  res.send(earnings);
+  if (result.isEmpty()) {
+    const earnings = await getEarningsByUserId(userId);
+
+    return res.send(earnings);
+  }
+
+  res.status(400).json({ errors: result.array() });
 });
 
 /* Expenses */
 
-router.post('/:userId/expenses', async (req, res) => {
+router.post('/:userId/expenses', expensePostValidator, async (req, res) => {
   const { userId } = req.params;
   const { value, description, category, date } = req.body;
 
-  const expense = await addExpense(userId, value, description, category, date);
+  const result = validationResult(req);
 
-  res.send({ id: expense.id });
+  if (result.isEmpty()) {
+    const expense = await addExpense(
+      userId,
+      value,
+      description,
+      category,
+      date
+    );
+
+    return res.send({ id: expense.id });
+  }
+
+  res.status(400).json({ errors: result.array() });
 });
 
-router.get('/:userId/expenses', async (req, res) => {
+router.get('/:userId/expenses', userIdValidator, async (req, res) => {
   const { userId } = req.params;
 
-  const expenses = await getExpensesByUserId(userId);
+  const result = validationResult(req);
 
-  res.send(expenses);
+  if (result.isEmpty()) {
+    const expenses = await getExpensesByUserId(userId);
+
+    return res.send(expenses);
+  }
+
+  res.status(400).json({ errors: result.array() });
 });
 
 module.exports = router;

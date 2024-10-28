@@ -41,7 +41,7 @@ describe('Test Earnings Routes', () => {
       userId: userId,
       value: 230,
       description: 'rent 2',
-      date: '2024-10-18T21:24:16.000Z',
+      date: '2024-7-27 13:36:05',
     };
 
     const res = await request(app)
@@ -80,7 +80,7 @@ describe('Test Earnings Routes', () => {
     const newEarningValues = {
       value: 111,
       description: 'rent',
-      date: '2024-10-18T21:24:16.000Z',
+      date: '2024-7-27 13:36:05',
     };
 
     const res = await request(app)
@@ -114,7 +114,7 @@ describe('Test Expenses Routes', () => {
       value: 150,
       description: 'health',
       category: 'health',
-      date: '2024-10-18T21:24:16.000Z',
+      date: '2024-7-27 13:36:05',
     };
 
     const res = await request(app)
@@ -154,7 +154,7 @@ describe('Test Expenses Routes', () => {
       value: 100,
       description: 'food',
       category: 'food ',
-      date: '2024-10-17T21:24:16.000Z',
+      date: '2024-7-27 13:36:05',
     };
 
     const res = await request(app)

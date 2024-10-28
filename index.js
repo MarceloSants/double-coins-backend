@@ -31,7 +31,7 @@ module.exports = app;
 
 // Done: Edit and Delete functions
 // Done: Edit and Delete routes
+// Done: Add test for edit and delete routes
 
-// Todo: Add test for edit and delete routes
 // Todo: Validation
 // Todo: Security
