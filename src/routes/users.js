@@ -10,6 +10,7 @@ const {
 } = require('../validators/userValidators');
 const { earningValidator } = require('../validators/earningValidators');
 const { expenseValidator } = require('../validators/expenseValidators');
+const authenticateToken = require('../auth');
 
 const router = express.Router();
 
@@ -18,104 +19,149 @@ const expensePostValidator = expenseValidator.concat(userIdValidator);
 
 /* User */
 
-router.post('/', userValidator, async (req, res) => {
-  const { name, email, password } = req.body;
+// router.get('/:userId', userIdValidator, async (req, res) => {
+//   const { userId } = req.params;
 
-  const result = validationResult(req);
-  if (result.isEmpty()) {
-    const user = await addUser(name, email, password);
+//   const result = validationResult(req);
 
-    return res.send({ id: user.id });
-  }
+//   if (result.isEmpty()) {
+//     const user = await getUserById(userId);
 
-  res.status(400).json({ errors: result.array() });
-});
+//     if (user) {
+//       return res.send(user);
+//     } else {
+//       return res
+//         .status(400)
+//         .json({ error: `cannot find a user with id ${userId}` });
+//     }
+//   }
 
-router.get('/:userId', userIdValidator, async (req, res) => {
-  const { userId } = req.params;
-
-  const result = validationResult(req);
-
-  if (result.isEmpty()) {
-    const user = await getUserById(userId);
-
-    if (user) {
-      return res.send(user);
-    } else {
-      return res
-        .status(400)
-        .json({ error: `cannot find a user with id ${userId}` });
-    }
-  }
-
-  res.status(400).json({ errors: result.array() });
-});
+//   res.status(400).json({ errors: result.array() });
+// });
 
 /* Eanings */
 
-router.post('/:userId/earnings', earningPostValidator, async (req, res) => {
-  const { userId } = req.params;
-  const { value, description, date } = req.body;
+router.post(
+  '/:userId/earnings',
+  [authenticateToken, earningPostValidator],
+  async (req, res) => {
+    const { userId } = req.params;
+    const { value, description, date } = req.body;
 
-  const result = validationResult(req);
-  if (result.isEmpty()) {
-    const earning = await addEarning(userId, value, description, date);
+    try {
+      const result = validationResult(req);
+      if (result.isEmpty()) {
+        if (req.user.id.toString() === userId) {
+          const earning = await addEarning(userId, value, description, date);
 
-    return res.send({ id: earning.id });
+          return res.send({ id: earning.id });
+        }
+        return res.sendStatus(403);
+      }
+
+      res.status(400).json({ errors: result.array() });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error adding earning',
+        error: error.message || error.toString(),
+      });
+    }
   }
+);
 
-  res.status(400).json({ errors: result.array() });
-});
+router.get(
+  '/:userId/earnings',
+  [authenticateToken, userIdValidator],
+  async (req, res) => {
+    const { userId } = req.params;
 
-router.get('/:userId/earnings', userIdValidator, async (req, res) => {
-  const { userId } = req.params;
+    try {
+      const result = validationResult(req);
 
-  const result = validationResult(req);
+      if (result.isEmpty()) {
+        if (req.user.id.toString() === userId) {
+          const earnings = await getEarningsByUserId(userId);
 
-  if (result.isEmpty()) {
-    const earnings = await getEarningsByUserId(userId);
+          return res.send(earnings);
+        }
+        return res.sendStatus(403);
+      }
 
-    return res.send(earnings);
+      res.status(400).json({ errors: result.array() });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error getting earnings',
+        error: error.message || error.toString(),
+      });
+    }
   }
-
-  res.status(400).json({ errors: result.array() });
-});
+);
 
 /* Expenses */
 
-router.post('/:userId/expenses', expensePostValidator, async (req, res) => {
-  const { userId } = req.params;
-  const { value, description, category, date } = req.body;
+router.post(
+  '/:userId/expenses',
+  [authenticateToken, expensePostValidator],
+  async (req, res) => {
+    const { userId } = req.params;
+    const { value, description, category, date } = req.body;
 
-  const result = validationResult(req);
+    try {
+      const result = validationResult(req);
 
-  if (result.isEmpty()) {
-    const expense = await addExpense(
-      userId,
-      value,
-      description,
-      category,
-      date
-    );
+      if (result.isEmpty()) {
+        if (req.user.id.toString() === userId) {
+          const expense = await addExpense(
+            userId,
+            value,
+            description,
+            category,
+            date
+          );
 
-    return res.send({ id: expense.id });
+          return res.send({ id: expense.id });
+        }
+
+        return res.sendStatus(403);
+      }
+
+      res.status(400).json({ errors: result.array() });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error adding expense',
+        error: error.message || error.toString(),
+      });
+    }
   }
+);
 
-  res.status(400).json({ errors: result.array() });
-});
+router.get(
+  '/:userId/expenses',
+  [authenticateToken, userIdValidator],
+  async (req, res) => {
+    const { userId } = req.params;
 
-router.get('/:userId/expenses', userIdValidator, async (req, res) => {
-  const { userId } = req.params;
+    try {
+      const result = validationResult(req);
 
-  const result = validationResult(req);
+      if (result.isEmpty()) {
+        if (req.user.id.toString() === userId) {
+          const expenses = await getExpensesByUserId(userId);
 
-  if (result.isEmpty()) {
-    const expenses = await getExpensesByUserId(userId);
+          return res.send(expenses);
+        }
 
-    return res.send(expenses);
+        return res.sendStatus(403);
+      }
+
+      res.status(400).json({ errors: result.array() });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error getting expenses',
+        error: error.message || error.toString(),
+      });
+    }
   }
-
-  res.status(400).json({ errors: result.array() });
-});
+);
 
 module.exports = router;

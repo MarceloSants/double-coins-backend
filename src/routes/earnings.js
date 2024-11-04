@@ -10,52 +10,101 @@ const {
   earningIdValidator,
   earningValidator,
 } = require('../validators/earningValidators');
+const authenticateToken = require('../auth');
 
 const router = express.Router();
 
 const updateValidator = earningIdValidator.concat(earningValidator);
 
-router.get('/:id', earningIdValidator, async (req, res) => {
-  const { id } = req.params;
+router.get(
+  '/:id',
+  [authenticateToken, earningIdValidator],
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const result = validationResult(req);
 
-  const result = validationResult(req);
+      if (result.isEmpty()) {
+        const earning = await getEarningById(id);
 
-  if (result.isEmpty()) {
-    const earning = await getEarningById(id);
+        if (earning.userId === req.user.id) {
+          return res.send(earning);
+        }
+        return res.sendStatus(403);
+      }
 
-    return res.send(earning);
+      res.status(400).json({ errors: result.array() });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error getting earning',
+        error: error.message || error.toString(),
+      });
+    }
   }
+);
 
-  res.status(400).json({ errors: result.array() });
-});
-
-router.put('/:id', updateValidator, async (req, res) => {
+router.put('/:id', [authenticateToken, updateValidator], async (req, res) => {
   const { id } = req.params;
   const { value, description, date } = req.body;
 
-  const result = validationResult(req);
+  try {
+    const result = validationResult(req);
 
-  if (result.isEmpty()) {
-    const updateResult = await updateEarningById(id, value, description, date);
+    if (result.isEmpty()) {
+      const earning = await getEarningById(id);
 
-    return res.send({ result: updateResult });
+      if (earning.userId === req.user.id) {
+        const updateResult = await updateEarningById(
+          id,
+          value,
+          description,
+          date
+        );
+
+        return res.send({ result: updateResult });
+      }
+
+      return res.sendStatus(403);
+    }
+
+    res.status(400).json({ errors: result.array() });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Error updating earning',
+      error: error.message || error.toString(),
+    });
   }
-
-  res.status(400).json({ errors: result.array() });
 });
 
-router.delete('/:id', earningIdValidator, async (req, res) => {
-  const { id } = req.params;
+router.delete(
+  '/:id',
+  [authenticateToken, earningIdValidator],
+  async (req, res) => {
+    const { id } = req.params;
 
-  const result = validationResult(req);
+    try {
+      const result = validationResult(req);
 
-  if (result.isEmpty()) {
-    const result = await removeEarningById(id);
+      if (result.isEmpty()) {
+        const earning = await getEarningById(id);
 
-    return res.send({ result: result });
+        if (earning.userId === req.user.id) {
+          const result = await removeEarningById(id);
+
+          return res.send({ result: result });
+        }
+
+        return res.sendStatus(403);
+      }
+
+      res.status(400).json({ errors: result.array() });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error deleting earning',
+        error: error.message || error.toString(),
+      });
+    }
   }
-
-  res.status(400).json({ errors: result.array() });
-});
+);
 
 module.exports = router;
