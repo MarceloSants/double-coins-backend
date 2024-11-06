@@ -6,15 +6,17 @@ const {
   updateEarningById,
   removeEarningById,
 } = require('../database/earning');
+
 const {
   earningIdValidator,
   earningValidator,
 } = require('../validators/earningValidators');
-const authenticateToken = require('../auth');
 
-const router = express.Router();
+const { authenticateToken } = require('../auth');
 
 const updateValidator = earningIdValidator.concat(earningValidator);
+
+const router = express.Router();
 
 router.get(
   '/:id',
@@ -60,10 +62,8 @@ router.put('/:id', [authenticateToken, updateValidator], async (req, res) => {
           description,
           date
         );
-
         return res.send({ result: updateResult });
       }
-
       return res.sendStatus(403);
     }
 
@@ -93,7 +93,6 @@ router.delete(
 
           return res.send({ result: result });
         }
-
         return res.sendStatus(403);
       }
 

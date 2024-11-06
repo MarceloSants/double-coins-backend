@@ -1,9 +1,9 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 
 const { getUserByEmail, addUser } = require('../database/user');
 const { userValidator } = require('../validators/userValidators');
 const { validationResult } = require('express-validator');
+const { generateToken } = require('../auth');
 
 const router = express.Router();
 
@@ -17,8 +17,11 @@ router.post('/register', userValidator, async (req, res) => {
       if (existingUser) {
         return res.status(400).json({ message: 'User already exists' });
       }
-      await addUser(name, email, password);
-      return res.status(201).json({ message: 'User registered successfully' });
+      const user = await addUser(name, email, password);
+
+      const token = generateToken(user.id);
+
+      return res.status(201).json({ token });
     }
     res.status(400).json({ errors: result.array() });
   } catch (error) {
@@ -37,13 +40,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign(
-      { id: user.id, name: user.name },
-      process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: '1h',
-      }
-    );
+    const token = generateToken(user.id);
 
     res.json({ token });
   } catch (error) {

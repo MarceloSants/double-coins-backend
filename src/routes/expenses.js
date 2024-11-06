@@ -6,15 +6,17 @@ const {
   updateExpenseById,
   removeExpenseById,
 } = require('../database/expenses');
+
 const {
   expenseIdValidator,
   expenseValidator,
 } = require('../validators/expenseValidators');
-const authenticateToken = require('../auth');
 
-const router = express.Router();
+const { authenticateToken } = require('../auth');
 
 const updateValidator = expenseIdValidator.concat(expenseValidator);
+
+const router = express.Router();
 
 router.get(
   '/:id',
@@ -30,7 +32,6 @@ router.get(
         if (expense.userId === req.user.id) {
           return res.send(expense);
         }
-
         return res.sendStatus(403);
       }
 
@@ -62,7 +63,6 @@ router.put('/:id', [authenticateToken, updateValidator], async (req, res) => {
           category,
           date
         );
-
         return res.send({ result: updateResult });
       }
       return res.sendStatus(403);
@@ -94,7 +94,6 @@ router.delete(
 
           return res.send({ result: result });
         }
-
         return res.sendStatus(403);
       }
 

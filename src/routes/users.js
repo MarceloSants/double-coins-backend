@@ -1,21 +1,19 @@
 const express = require('express');
 const { validationResult } = require('express-validator');
 
-const { addUser, getUserById } = require('../database/user');
 const { getEarningsByUserId, addEarning } = require('../database/earning');
 const { getExpensesByUserId, addExpense } = require('../database/expenses');
-const {
-  userValidator,
-  userIdValidator,
-} = require('../validators/userValidators');
+
+const { userIdValidator } = require('../validators/userValidators');
 const { earningValidator } = require('../validators/earningValidators');
 const { expenseValidator } = require('../validators/expenseValidators');
-const authenticateToken = require('../auth');
 
-const router = express.Router();
+const { authenticateToken } = require('../auth');
 
 const earningPostValidator = earningValidator.concat(userIdValidator);
 const expensePostValidator = expenseValidator.concat(userIdValidator);
+
+const router = express.Router();
 
 /* User */
 
@@ -54,7 +52,7 @@ router.post(
         if (req.user.id.toString() === userId) {
           const earning = await addEarning(userId, value, description, date);
 
-          return res.send({ id: earning.id });
+          return res.status(201).send({ id: earning.id });
         }
         return res.sendStatus(403);
       }
@@ -119,9 +117,8 @@ router.post(
             date
           );
 
-          return res.send({ id: expense.id });
+          return res.status(201).send({ id: expense.id });
         }
-
         return res.sendStatus(403);
       }
 
@@ -150,7 +147,6 @@ router.get(
 
           return res.send(expenses);
         }
-
         return res.sendStatus(403);
       }
 

@@ -19,4 +19,12 @@ function authenticateToken(req, res, next) {
   });
 }
 
-module.exports = authenticateToken;
+function generateToken(id) {
+  const token = jwt.sign({ id: id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '1h',
+  });
+
+  return token;
+}
+
+module.exports = { generateToken, authenticateToken };

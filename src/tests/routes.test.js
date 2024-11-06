@@ -1,30 +1,32 @@
 const request = require('supertest');
+
 const app = require('../../index');
+const { generateToken } = require('../auth');
 
-/* Users routes */
-
-describe('Test User Routes', () => {
-  it('should add a new user', async () => {
+describe('Test Auth Routes', () => {
+  it('Should register a new user', async () => {
     const newUser = {
-      name: 'UserName',
-      email: 'email@test.com',
+      name: 'UserName5',
+      email: 'email@test5.com',
       password: '12345',
     };
 
-    const res = await request(app).post('/users').send(newUser);
+    const res = await request(app).post('/register').send(newUser);
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('id');
+    expect(res.statusCode).toEqual(201);
   });
+});
 
-  // Test the route to get an user by Id
-  it('should fetch an user by id', async () => {
-    const userId = 1;
+describe('Test Auth Routes', () => {
+  it('Should accept login', async () => {
+    const user = {
+      email: 'email@test1.com',
+      password: '12345',
+    };
 
-    const res = await request(app).get(`/users/${userId}`);
+    const res = await request(app).post('/login').send(user);
 
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('id', userId);
   });
 });
 
@@ -33,7 +35,6 @@ describe('Test User Routes', () => {
 describe('Test Earnings Routes', () => {
   let earningAddedId;
 
-  // Test the route to get an earning by id
   it('should add a new earning', async () => {
     const userId = 1;
 
@@ -44,21 +45,27 @@ describe('Test Earnings Routes', () => {
       date: '2024-7-27 13:36:05',
     };
 
+    const token = generateToken(userId);
+
     const res = await request(app)
       .post(`/users/${userId}/earnings`)
+      .set('Authorization', `Bearer ${token}`)
       .send(newEarning);
 
     earningAddedId = res.body.id;
 
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toEqual(201);
     expect(res.body).toHaveProperty('id');
   });
 
-  // Test the route to get earnings by userId
   it('should fetch earnings by userId', async () => {
     const userId = 1;
 
-    const res = await request(app).get(`/users/${userId}/earnings`);
+    const token = generateToken(userId);
+
+    const res = await request(app)
+      .get(`/users/${userId}/earnings`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toBeInstanceOf(Array);
@@ -68,7 +75,13 @@ describe('Test Earnings Routes', () => {
   it('should fetch a specific earning by id', async () => {
     const earningId = earningAddedId;
 
-    const res = await request(app).get(`/earnings/${earningId}`);
+    const userId = 1;
+
+    const token = generateToken(userId);
+
+    const res = await request(app)
+      .get(`/earnings/${earningId}`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('id', earningId);
@@ -76,6 +89,9 @@ describe('Test Earnings Routes', () => {
 
   it('should update a specific earning by id', async () => {
     const earningId = earningAddedId;
+
+    const userId = 1;
+    const token = generateToken(userId);
 
     const newEarningValues = {
       value: 111,
@@ -85,6 +101,7 @@ describe('Test Earnings Routes', () => {
 
     const res = await request(app)
       .put(`/earnings/${earningId}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(newEarningValues);
 
     expect(res.statusCode).toEqual(200);
@@ -94,7 +111,13 @@ describe('Test Earnings Routes', () => {
   it('should remove a specific earning by id', async () => {
     const earningId = earningAddedId;
 
-    const res = await request(app).delete(`/earnings/${earningId}`);
+    const userId = 1;
+
+    const token = generateToken(userId);
+
+    const res = await request(app)
+      .delete(`/earnings/${earningId}`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('result', true);
@@ -106,9 +129,9 @@ describe('Test Earnings Routes', () => {
 describe('Test Expenses Routes', () => {
   let expenseAddedId;
 
-  // Test the route to get an expenses by id
   it('should add a new expense', async () => {
     const userId = 1;
+
     const newExpense = {
       userId: userId,
       value: 150,
@@ -117,31 +140,42 @@ describe('Test Expenses Routes', () => {
       date: '2024-7-27 13:36:05',
     };
 
+    const token = generateToken(userId);
+
     const res = await request(app)
       .post(`/users/${userId}/expenses`)
+      .set('Authorization', `Bearer ${token}`)
       .send(newExpense);
 
     expenseAddedId = res.body.id;
 
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toEqual(201);
     expect(res.body).toHaveProperty('id');
   });
 
-  // Test the route to get expenses by userId
   it('should fetch expenses by userId', async () => {
     const userId = 1;
 
-    const res = await request(app).get(`/users/${userId}/expenses`);
+    const token = generateToken(userId);
+
+    const res = await request(app)
+      .get(`/users/${userId}/expenses`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toBeInstanceOf(Array);
   });
 
-  // Test the route to get an expenses by id
   it('should fetch a specific expense by id', async () => {
     const expensesId = expenseAddedId;
 
-    const res = await request(app).get(`/expenses/${expensesId}`);
+    const userId = 1;
+
+    const token = generateToken(userId);
+
+    const res = await request(app)
+      .get(`/expenses/${expensesId}`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('id', expensesId);
@@ -157,8 +191,13 @@ describe('Test Expenses Routes', () => {
       date: '2024-7-27 13:36:05',
     };
 
+    const userId = 1;
+
+    const token = generateToken(userId);
+
     const res = await request(app)
       .put(`/expenses/${expenseId}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(newExpenseValues);
 
     expect(res.statusCode).toEqual(200);
@@ -168,7 +207,13 @@ describe('Test Expenses Routes', () => {
   it('should remove a specific expense by id', async () => {
     const expenseId = expenseAddedId;
 
-    const res = await request(app).delete(`/expenses/${expenseId}`);
+    const userId = 1;
+
+    const token = generateToken(userId);
+
+    const res = await request(app)
+      .delete(`/expenses/${expenseId}`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('result', true);
